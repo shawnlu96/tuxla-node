@@ -2,6 +2,7 @@ const {getProxy} = require("../middlewares/proxy");
 const axios = require("axios");
 const moment =require("moment")
 const {set} = require("../utils/data");
+const {heartbeat} = require("../middlewares/heartbeat");
 require('dotenv').config();
 
 async function startEnv(req, res){
@@ -18,8 +19,9 @@ async function startEnv(req, res){
         if(response.data.code === 0)console.log("proxy updated",account.envId, proxy)
     }
     const response = await axios.get(`${process.env.ADSPOWER_API}/browser/start?user_id=${account.envId}`)
-    if(response.data.code===200){
+    if(response.data.code===0){
         set(account.envId, account)
+        await heartbeat()
     }
     res.json(response.data)
 }
