@@ -5,6 +5,25 @@ const {set} = require("../utils/data");
 const {heartbeat} = require("../middlewares/heartbeat");
 require('dotenv').config();
 
+async function refreshProxy(req, res) {
+    const account = req.body
+    const proxy = await getProxy(account.ipRegion)
+
+    const data = {
+        "user_id": account.envId,
+        "user_proxy_config": proxy ? {
+            "proxy_soft": "other",
+            "proxy_type": "http",
+            "proxy_host": proxy.host,
+            "proxy_port": proxy.port,
+            "proxy_user": proxy.user,
+            "proxy_password": proxy.password
+        } : {"proxy_soft": "no_proxy"}
+    }
+    const response = await axios.post(`${process.env.ADSPOWER_API}/user/update`, data, {headers: {'Content-Type': 'application/json'}})
+    res.json(response.data)
+}
+
 async function startEnv(req, res) {
 
     const account = req.body
@@ -21,7 +40,7 @@ async function startEnv(req, res) {
                 "proxy_port": proxy.port,
                 "proxy_user": proxy.user,
                 "proxy_password": proxy.password
-            } : {"proxy_soft":"no_proxy"}
+            } : {"proxy_soft": "no_proxy"}
         }
         const response = await axios.post(`${process.env.ADSPOWER_API}/user/update`, data, {headers: {'Content-Type': 'application/json'}})
         if (response.data.code === 0) console.log("proxy updated", account.envId, proxy)
@@ -47,14 +66,14 @@ async function createEnv(req, res) {
         ],
         "username": account.accountName,
         "password": account.password,
-        "user_proxy_config":proxy ? {
+        "user_proxy_config": proxy ? {
             "proxy_soft": "other",
             "proxy_type": "http",
             "proxy_host": proxy.host,
             "proxy_port": proxy.port,
             "proxy_user": proxy.user,
             "proxy_password": proxy.password
-        } : {"proxy_soft":"no_proxy"}
+        } : {"proxy_soft": "no_proxy"}
     });
 
     const response = await axios.post(`${process.env.ADSPOWER_API}/user/create`, data, {headers: {'Content-Type': 'application/json'}})
@@ -66,12 +85,12 @@ async function createEnv(req, res) {
 
 async function deleteEnv(req, res) {
     const envId = req.body.envId
-    const data = JSON.stringify({user_ids:[envId]})
+    const data = JSON.stringify({user_ids: [envId]})
     const response = await axios.post(`${process.env.ADSPOWER_API}/user/delete`, data, {headers: {'Content-Type': 'application/json'}})
     res.json(response.data)
 
 }
 
 module.exports = {
-    startEnv, createEnv,deleteEnv
+    startEnv, createEnv, deleteEnv, refreshProxy
 }
