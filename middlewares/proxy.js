@@ -2,6 +2,7 @@ const crypto = require('crypto');
 const request = require("request");
 
 async function getProxy(region) {
+    if(!region || region.trim().length===0) return null
     for (let i = 0; i < 10; i++) {
         const proxy = generateProxy(region ?? 'sg')
         if(await checkLocalProxy(`http://${proxy.user}:${proxy.password}@${proxy.host}:${proxy.port}`)) return proxy

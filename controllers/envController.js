@@ -13,14 +13,14 @@ async function startEnv(req, res) {
 
         const data = {
             "user_id": account.envId,
-            "user_proxy_config": {
+            "user_proxy_config": proxy ? {
                 "proxy_soft": "other",
                 "proxy_type": "http",
                 "proxy_host": proxy.host,
                 "proxy_port": proxy.port,
                 "proxy_user": proxy.user,
                 "proxy_password": proxy.password
-            }
+            } : {"proxy_soft":"no_proxy"}
         }
         const response = await axios.post(`${process.env.ADSPOWER_API}/user/update`, data, {headers: {'Content-Type': 'application/json'}})
         if (response.data.code === 0) console.log("proxy updated", account.envId, proxy)
@@ -46,14 +46,14 @@ async function createEnv(req, res) {
         ],
         "username": account.accountName,
         "password": account.password,
-        "user_proxy_config": {
+        "user_proxy_config":proxy ? {
             "proxy_soft": "other",
             "proxy_type": "http",
             "proxy_host": proxy.host,
             "proxy_port": proxy.port,
             "proxy_user": proxy.user,
             "proxy_password": proxy.password
-        }
+        } : {"proxy_soft":"no_proxy"}
     });
 
     const response = await axios.post(`${process.env.ADSPOWER_API}/user/create`, data, {headers: {'Content-Type': 'application/json'}})
