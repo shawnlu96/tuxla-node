@@ -1,9 +1,17 @@
 const {getAll, remove} = require("../utils/data");
 const axios = require("axios");
-const ip = require('ip');
-const currentIP = ip.address()
+const getCurrentIP = async () => {
+    const ipResponse = await axios.get("https://api.ipify.org")
+    console.log('current ip:', ipResponse.data)
+    return ipResponse.data
+}
 
-async function heartbeat(){
+let currentIP = null
+
+async function heartbeat() {
+    if(!currentIP){
+        currentIP = await getCurrentIP()
+    }
     const entryToDelete = []
     for (const {key, value} of getAll()) {
         try {
@@ -16,13 +24,11 @@ async function heartbeat(){
     }
 
 
-
     for (let envId of entryToDelete) {
         remove(envId)
     }
-    console.log(getAll())
 
-    const response = await axios.post(`${process.env.TUXLA_API}/server/heartbeat`,{
+    const response = await axios.post(`${process.env.TUXLA_API}/server/heartbeat`, {
         ip: currentIP,
         envIds: getAll().map(kv => kv.key)
     })

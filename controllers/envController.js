@@ -6,6 +6,7 @@ const {heartbeat} = require("../middlewares/heartbeat");
 require('dotenv').config();
 
 async function startEnv(req, res) {
+
     const account = req.body
     // 超过4h就重新设置代理
     if (moment.utc(account.updateTime).isBefore(moment.utc().subtract(4, 'hours'))) {

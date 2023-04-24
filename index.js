@@ -4,6 +4,7 @@ const bodyParser = require('body-parser');
 const express = require('express');
 const app = express();
 const cors = require('cors');
+const morgan = require('morgan')
 
 
 const envRouter = require('./routes/env');
@@ -13,6 +14,7 @@ const {heartbeat} = require("./middlewares/heartbeat");
 
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(bodyParser.json());
+app.use(morgan('dev'))
 // 允许所有来源的请求
 app.use(cors());
 
