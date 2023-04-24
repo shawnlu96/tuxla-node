@@ -5,12 +5,15 @@ const {set} = require("../utils/data");
 const {heartbeat} = require("../middlewares/heartbeat");
 require('dotenv').config();
 
-async function refreshProxy(req, res) {
+async function update(req, res) {
     const account = req.body
     const proxy = await getProxy(account.ipRegion)
 
     const data = {
         "user_id": account.envId,
+        "name": account.accountName,
+        "username": account.accountName,
+        "password": account.password,
         "user_proxy_config": proxy ? {
             "proxy_soft": "other",
             "proxy_type": "http",
@@ -30,7 +33,6 @@ async function startEnv(req, res) {
     // 超过4h就重新设置代理
     if (moment.utc(account.updateTime).isBefore(moment.utc().subtract(4, 'hours'))) {
         const proxy = await getProxy(account.ipRegion)
-
         const data = {
             "user_id": account.envId,
             "user_proxy_config": proxy ? {
@@ -92,5 +94,5 @@ async function deleteEnv(req, res) {
 }
 
 module.exports = {
-    startEnv, createEnv, deleteEnv, refreshProxy
+    startEnv, createEnv, deleteEnv, update
 }

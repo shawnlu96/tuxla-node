@@ -6,6 +6,6 @@ const envController = require('../controllers/envController')
 router.post('/start', envController.startEnv)
 router.post('/create', envController.createEnv)
 router.post('/delete', envController.deleteEnv)
-router.post('/refreshProxy', envController.refreshProxy)
+router.post('/update', envController.update)
 
 module.exports = router;
