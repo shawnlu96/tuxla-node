@@ -3,6 +3,7 @@ const axios = require("axios");
 const moment = require("moment")
 const {set} = require("../utils/data");
 const {heartbeat} = require("../middlewares/heartbeat");
+const {testMethod} = require("../middlewares/browser");
 require('dotenv').config();
 
 async function update(req, res) {
@@ -27,6 +28,8 @@ async function update(req, res) {
     res.json(response.data)
 }
 
+
+
 async function startEnv(req, res) {
 
     const account = req.body
@@ -49,7 +52,7 @@ async function startEnv(req, res) {
     }
     const response = await axios.get(`${process.env.ADSPOWER_API}/browser/start?user_id=${account.envId}`)
     if (response.data.code === 0) {
-        set(account.envId, account)
+        set(account.envId, {account, handle: response.data.data})
         await heartbeat()
     }
     res.json(response.data)

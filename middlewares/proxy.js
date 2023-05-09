@@ -5,16 +5,18 @@ async function getProxy(region) {
     if(!region || region.trim().length===0) return null
     for (let i = 0; i < 10; i++) {
         const proxy = generateProxy(region ?? 'sg')
-        if(await checkLocalProxy(`http://${proxy.user}:${proxy.password}@${proxy.host}:${proxy.port}`)) return proxy
+        const proxyUrl = `http://${proxy.user}:${proxy.password}@${proxy.host}:${proxy.port}`
+        if(await checkLocalProxy(proxyUrl, 'https://coinlist.co/assets/index/new_home/icon_first-95d2a45595679fb545cc998faa7b488e2b926c78bfe6b9539387dcd59d64c10a.svg')
+        && await checkLocalProxy(proxyUrl, 'https://www.google.com/images/branding/googleg/1x/googleg_standard_color_128dp.png?_t=1683639265')) return proxy
     }
     return null
 }
 
-const checkLocalProxy = function(proxyUrl){
+const checkLocalProxy = function(proxyUrl, testUrl){
     return new Promise((resolve, reject) => {
         const req = request(
             {
-                url:'https://coinlist.co/assets/index/new_home/icon_first-95d2a45595679fb545cc998faa7b488e2b926c78bfe6b9539387dcd59d64c10a.svg',
+                url: testUrl,
                 proxy: proxyUrl,
             }
             ,(err, response,body) => {
