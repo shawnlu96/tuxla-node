@@ -1,7 +1,8 @@
-const crypto = require('crypto');
-const request = require("request");
+import crypto from 'crypto';
+import request from 'request';
 
-async function getProxy(region) {
+
+export async function getProxy(region) {
     if(!region || region.trim().length===0) return null
     for (let i = 0; i < 10; i++) {
         const proxy = generateProxy(region ?? 'sg')
@@ -52,4 +53,3 @@ function newRandomId(length) {
     return base64.replace(/[+/=]/g, '').substring(0, length).toLowerCase();
 }
 
-module.exports = {getProxy}

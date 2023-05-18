@@ -1,5 +1,6 @@
-const {getAll, remove} = require("../utils/data");
-const axios = require("axios");
+import axios from "axios";
+import {getAll, remove} from "../utils/data.js";
+
 const getCurrentIP = async () => {
     const ipResponse = await axios.get("https://api.ipify.org")
     console.log('current ip:', ipResponse.data)
@@ -8,7 +9,7 @@ const getCurrentIP = async () => {
 
 let currentIP = null
 
-async function heartbeat() {
+export async function heartbeat() {
     if(!currentIP){
         currentIP = await getCurrentIP()
     }
@@ -34,4 +35,3 @@ async function heartbeat() {
     })
 }
 
-module.exports = {heartbeat}

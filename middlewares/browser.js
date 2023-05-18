@@ -1,28 +1,33 @@
-const axios = require("axios");
-const {get} = require("../utils/data");
-const puppeteer = require('puppeteer-core');
+import puppeteer from 'puppeteer-extra';
+import login from "./handlers/login/index.js";
+import multi from "./handlers/multiFactor/index.js";
 
-
-async function testMethod(envId) {
-    const {account, handle} = get(envId)
-    console.log(handle)
-    const puppUrl = handle.ws.puppeteer
-    const browser = await puppeteer.connect({browserWSEndpoint: puppUrl, defaultViewport:null});
-    const page = await  browser.newPage()
-    await page.goto('https://coinlist.co/login')
-
-    const emailInput = await page.waitForSelector('#user_email')
-    const pwdInput = await page.waitForSelector('#user_password')
-    await emailInput.focus()
-    // await page.evaluate(text => pwdInput.value=text, account.password)
-    await page.keyboard.type(account.accountName)
-    await pwdInput.focus()
-    await page.keyboard.type(account.password)
-    await page.click('input[type="submit"]')
-
+export async function registerBrowser(puppeteerEndpoint, account) {
+    const loginPages = new WeakSet();
+    const browser = await puppeteer.connect({browserWSEndpoint: puppeteerEndpoint, defaultViewport: null})
+    browser.on("targetchanged", async target => {
+        // if (target.url().includes("https://coinlist.co/login")) {
+        //     const loginPage = await target.page();
+        //     if(loginPages.has(loginPage)) return;
+        //     loginPages.add(loginPage)
+        //     try {
+        //         await login(loginPage, account)
+        //     } catch (e) {
+        //         console.error(e.message)
+        //     } finally {
+        //         loginPages.delete(loginPage)
+        //     }
+        // }else
+            if(target.url().includes("https://coinlist.co/multi_factor")){
+            const multiPage = await target.page();
+            try {
+                await multi(multiPage, account);
+            }catch (e){
+                console.error(e.message)
+            }
+        }
+    })
+    return browser;
 }
 
 
-module.exports =  {
-    testMethod
-}

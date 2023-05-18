@@ -1,11 +1,11 @@
-const express = require('express');
-const router = express.Router();
+import express from 'express';
+import * as envController from "../controllers/envController.js";
 
-const envController = require('../controllers/envController')
+const router = express.Router();
 
 router.post('/start', envController.startEnv)
 router.post('/create', envController.createEnv)
 router.post('/delete', envController.deleteEnv)
 router.post('/update', envController.update)
 
-module.exports = router;
+export default router;

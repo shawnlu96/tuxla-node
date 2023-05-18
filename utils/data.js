@@ -2,19 +2,19 @@
 
 const data = new Map();
 
-function get(key) {
+export function get(key) {
     return data.get(key);
 }
 
-function set(key, value) {
+export function set(key, value) {
     data.set(key, value);
 }
 
-function remove(key) {
+export function remove(key) {
     data.delete(key);
 }
 
-function getAll() {
+export function getAll() {
     const result = [];
     for (const [key, value] of data.entries()) {
         result.push({ key, value });
@@ -22,9 +22,3 @@ function getAll() {
     return result;
 }
 
-module.exports = {
-    get,
-    set,
-    remove,
-    getAll,
-};

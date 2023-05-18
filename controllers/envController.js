@@ -1,12 +1,15 @@
-const {getProxy} = require("../middlewares/proxy");
-const axios = require("axios");
-const moment = require("moment")
-const {set} = require("../utils/data");
-const {heartbeat} = require("../middlewares/heartbeat");
-const {testMethod} = require("../middlewares/browser");
-require('dotenv').config();
+// import { getProxy } from "../middlewares/proxy";
+import axios from "axios";
+import moment from "moment";
+import { heartbeat } from "../middlewares/heartbeat.js";
+import { registerBrowser } from "../middlewares/browser.js";
 
-async function update(req, res) {
+import dotenv from 'dotenv';
+import {getProxy} from "../middlewares/proxy.js";
+import {set} from "../utils/data.js";
+import login from "../middlewares/handlers/login/index.js";
+dotenv.config();
+export async function update(req, res) {
     const account = req.body
     const proxy = await getProxy(account.ipRegion)
 
@@ -30,7 +33,7 @@ async function update(req, res) {
 
 
 
-async function startEnv(req, res) {
+export async function startEnv(req, res) {
 
     const account = req.body
     // 超过4h就重新设置代理
@@ -52,13 +55,16 @@ async function startEnv(req, res) {
     }
     const response = await axios.get(`${process.env.ADSPOWER_API}/browser/start?user_id=${account.envId}`)
     if (response.data.code === 0) {
-        set(account.envId, {account, handle: response.data.data})
+        const browser = await registerBrowser(response.data.data.ws.puppeteer, account);
+        const loginPage = await browser.newPage()
+        await login(loginPage, account)
+        set(account.envId, {account, browser})
         await heartbeat()
     }
     res.json(response.data)
 }
 
-async function createEnv(req, res) {
+export async function createEnv(req, res) {
     const account = req.body
     const proxy = await getProxy(account.ipRegion)
 
@@ -88,14 +94,10 @@ async function createEnv(req, res) {
 
 }
 
-async function deleteEnv(req, res) {
+export async function deleteEnv(req, res) {
     const envId = req.body.envId
     const data = JSON.stringify({user_ids: [envId]})
     const response = await axios.post(`${process.env.ADSPOWER_API}/user/delete`, data, {headers: {'Content-Type': 'application/json'}})
     res.json(response.data)
 
-}
-
-module.exports = {
-    startEnv, createEnv, deleteEnv, update
 }
