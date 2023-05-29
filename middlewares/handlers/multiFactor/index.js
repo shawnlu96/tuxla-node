@@ -26,9 +26,8 @@ async function multi(multiPage, account){
     })
 
 
-    await multiPage.waitForFunction(()=>document.readyState === 'complete', {timeout:320000})
-    console.log(`${account.accountName}: multi factor page is ready`)
     const codeInput = await multiPage.waitForSelector("#multi_factor_authentication_totp_otp_attempt")
+    console.log(`${account.accountName}: multi factor page is ready`)
     const code = totp(account.secret)
     await codeInput.focus();
     await multiPage.keyboard.type(code)
