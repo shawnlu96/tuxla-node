@@ -34,7 +34,6 @@ export async function update(req, res) {
 
 
 export async function startEnv(req, res) {
-
     const account = req.body
     // 超过4h就重新设置代理
     if (moment.utc(account.updateTime).isBefore(moment.utc().subtract(4, 'hours'))) {
@@ -57,7 +56,7 @@ export async function startEnv(req, res) {
     if (response.data.code === 0) {
         const browser = await registerBrowser(response.data.data.ws.puppeteer, account);
         const loginPage = await browser.newPage()
-        await login(loginPage, account)
+        await loginPage.goto('https://coinlist.co/login')
         set(account.envId, {account, browser})
         await heartbeat()
     }

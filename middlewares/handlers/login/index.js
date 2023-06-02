@@ -1,51 +1,28 @@
 import freeze from "../../../utils/freeze.js";
 
-async function login(loginPage, account) {
+async function login(loginPage, account,logger, nextStep) {
     try {
-
-        loginPage.on("request", async (request) => {
-            const url = await request.url();
-            if (url.includes("https://imgs.hcaptcha.com/") || url.includes("https://bam-cell.nr-data.net/events/1")) {
-                console.log("hCaptcha found.")
-                try {
-                    await loginPage.solveRecaptchas()
-                }catch (e){
-                    console.error(e.message)
-                }
-            }
-        });
-
-        // loginPage.on("response", async (response) => {
-        //     const url = await response.url();
-        //     if (url.includes("https://coinlist.co/users/login")) {
-        //         console.log(response.status())
-        //         console.log("登入成功，正在重定向到：" + response.headers().location)
+        // Capture the redirected URL when a 302 request is intercepted
+        // loginPage.on('request', interceptedRequest => {
+        //     if (interceptedRequest.isNavigationRequest() && interceptedRequest.redirectChain().length > 0) {
+        //         const redirectedUrl = interceptedRequest.redirectChain()[interceptedRequest.redirectChain().length - 1].response().headers().location;
+        //         logger(`302 redirection detected to ${redirectedUrl}`);
         //     }
-        // })
+        //     interceptedRequest.continue();
+        // });
 
-        const handleHCaptcha = async () => {
-                // const isCaptcha = await loginPage.evaluate(() => {
-                //     const iframes = document.getElementsByTagName('iframe');
-                //     for (const iframe of iframes) {
-                //         if (iframe.title === 'hCaptcha') {
-                //             const node = iframe.parentNode.parentNode;
-                //             const style = node.style;
-                //             return style.opacity + '' === '1';
-                //         }
-                //     }
-                // }).catch(err => {
-                //     console.log(err.message);
-                // });
-                //
-                // if (isCaptcha) {
-                //     await loginPage.solveRecaptchas()
-                // }
-            };
-        await loginPage.goto("https://coinlist.co/login")
-        await loginPage.waitForNetworkIdle({idleTime:500, timeout:200000})
-        await loginPage.waitForFunction(() => !document.body.innerText.includes('Cloudflare'), {timeout:120000});
-        await loginPage.waitForFunction(() => document.readyState === 'complete',{timeout:120000})
-        console.log(`${account.accountName}: Login page is ready.`)
+
+        await loginPage.waitForFunction(() => {
+            return document.readyState === 'complete' && !document.body.innerText.includes('Cloudflare')
+        }, {polling: 500, timeout: 300000})
+        // if already signed in
+        if (await loginPage.evaluate(() => document.body.innerText.includes('You are already signed in.'))) {
+            logger(`already signed in`)
+            await nextStep?.()
+            return true
+        }
+        logger(`Login page is ready.`)
+        // actual login
         const emailInput = await loginPage.waitForSelector('#user_email')
         const pwdInput = await loginPage.waitForSelector('#user_password')
         await emailInput.focus()
@@ -56,7 +33,7 @@ async function login(loginPage, account) {
         await loginPage.keyboard.type(account.password)
         await loginPage.click('input[type="submit"]')
     } catch (e) {
-        console.error(e, "error occurred when logging in.")
+        console.error("error occurred when logging in.", e)
         return false;
     }
     return true;

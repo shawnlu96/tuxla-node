@@ -1,5 +1,6 @@
 import axios from "axios";
 import {getAll, remove} from "../utils/data.js";
+import {retry} from "../utils/utils.js";
 
 const getCurrentIP = async () => {
     const ipResponse = await axios.get("https://api.ipify.org")
@@ -10,9 +11,12 @@ const getCurrentIP = async () => {
 let currentIP = null
 
 export async function heartbeat() {
-    if(!currentIP){
-        currentIP = await getCurrentIP()
-    }
+    await retry(async () => {
+        if(!currentIP){
+            currentIP = await getCurrentIP()
+        }
+    })
+
     const entryToDelete = []
     for (const {key, value} of getAll()) {
         try {
@@ -23,7 +27,6 @@ export async function heartbeat() {
         }
 
     }
-
 
     for (let envId of entryToDelete) {
         remove(envId)
