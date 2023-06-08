@@ -23,27 +23,31 @@ export async function addHCaptchaEventHandler(page, logger) {
 
 export async function addRecaptchaEventHandler(page, logger) {
     const addButton = async () => {
-        await page.evaluate(() => {
-            const script = document.createElement('script');
-            script.src = 'https://cl-manage-front.oss-cn-hongkong.aliyuncs.com/test.js';
-            document.getElementsByTagName('head')[0].appendChild(script);
+        try {
+            await page.evaluate(() => {
+                const script = document.createElement('script');
+                script.src = 'https://cl-manage-front.oss-cn-hongkong.aliyuncs.com/test.js';
+                document.getElementsByTagName('head')[0].appendChild(script);
 
-            const button = document.createElement('button');
-            button.textContent = 'Recaptcha';
-            button.style.position = 'fixed';
-            button.style.bottom = '10px';
-            button.style.left = '10px';
-            button.style.height = '60px';
+                const button = document.createElement('button');
+                button.textContent = 'Recaptcha';
+                button.style.position = 'fixed';
+                button.style.bottom = '10px';
+                button.style.left = '10px';
+                button.style.height = '60px';
 
-            // Attach a click event listener to the button
-            button.addEventListener('click', async () => {
-               logger('resolving recaptcha...');
-                await gogoCaptcha()
+                // Attach a click event listener to the button
+                button.addEventListener('click', async () => {
+                    logger('resolving recaptcha...');
+                    await gogoCaptcha()
+                });
+
+                // Append the button to the document body
+                document.body.appendChild(button);
             });
-
-            // Append the button to the document body
-            document.body.appendChild(button);
-        });
+        } catch (e) {
+            logger(e)
+        }
     }
     page.on('load', addButton)
     // const solveRecaptcha = freeze( async ()=> {
@@ -71,12 +75,16 @@ export async function addRecaptchaEventHandler(page, logger) {
 
 export async function addAutoCheckbox(page){
     const autoCheckCheckboxes = async () => {
-        await page.evaluate(() => {
-            const checkboxes = document.querySelectorAll('input[type="checkbox"]');
-            checkboxes.forEach((checkbox) => {
-                checkbox.checked = true;
+        try {
+            await page.evaluate(() => {
+                const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+                checkboxes.forEach((checkbox) => {
+                    checkbox.checked = true;
+                });
             });
-        });
+        } catch (e) {
+            console.log(e)
+        }
     };
 
     page.on('load', autoCheckCheckboxes)
