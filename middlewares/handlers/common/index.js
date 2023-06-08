@@ -31,8 +31,8 @@ export async function addRecaptchaEventHandler(page, logger) {
             const button = document.createElement('button');
             button.textContent = 'Recaptcha';
             button.style.position = 'fixed';
-            button.style.top = '10px';
-            button.style.right = '10px';
+            button.style.bottom = '10px';
+            button.style.left = '10px';
             button.style.height = '60px';
 
             // Attach a click event listener to the button
