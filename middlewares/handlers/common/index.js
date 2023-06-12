@@ -38,7 +38,7 @@ export async function addRecaptchaEventHandler(page, logger) {
 
                 // Attach a click event listener to the button
                 button.addEventListener('click', async () => {
-                    logger('resolving recaptcha...');
+                    console.log('resolving recaptcha...');
                     await gogoCaptcha()
                 });
 
