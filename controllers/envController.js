@@ -35,6 +35,20 @@ export async function requeue(req, res) {
 
 }
 
+export async function requeuenew(req, res) {
+    try {
+        const envId = req.query.envId
+        const {account, browser} = get(envId)
+        const newPage = await browser.newPage()
+        await newPage.goto('https://sales.coinlist.co/queue/enter_queue/archway')
+        await newPage.bringToFront()
+        res.json({code: '0', message: 'ok'})
+    }catch (e) {
+        res.json({code:'1',message:e.message})
+    }
+
+}
+
 
 dotenv.config();
 
