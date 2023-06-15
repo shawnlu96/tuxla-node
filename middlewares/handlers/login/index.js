@@ -1,4 +1,5 @@
 import freeze from "../../../utils/freeze.js";
+import {retry, sleep} from "../../../utils/utils.js";
 
 async function login(loginPage, account,logger, nextStep) {
     try {
@@ -32,6 +33,20 @@ async function login(loginPage, account,logger, nextStep) {
         await pwdInput.click({clickCount: 3, delay: 50})
         await loginPage.keyboard.type(account.password)
         await loginPage.click('input[type="submit"]')
+        let redirectDetected = false
+        loginPage.on('response', (response) => {
+            if (response.status() >= 300 && response.status() < 400) {
+                redirectDetected = true;
+            }
+        });
+        await sleep(6000)
+        await retry(async () => {
+            if(!redirectDetected){
+                await loginPage.solveRecaptchas()
+            }
+            await sleep(3000)
+            if(!redirectDetected) throw new Error('not redirecting...')
+        },10)
     } catch (e) {
         console.error("error occurred when logging in.", e)
         return false;

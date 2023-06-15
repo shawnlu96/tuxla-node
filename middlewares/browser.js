@@ -1,21 +1,27 @@
 import puppeteer from 'puppeteer-extra';
 import login from "./handlers/login/index.js";
 import multi from "./handlers/multiFactor/index.js";
-import {addAutoCheckbox, addHCaptchaEventHandler, addRecaptchaEventHandler} from "./handlers/common/index.js";
+import {
+    addAutoCheckbox,
+    AddButtonForReEnterQueue,
+    addHCaptchaEventHandler,
+    addRecaptchaEventHandler
+} from "./handlers/common/index.js";
 import {onboarding, participating, quiz, residence} from "./handlers/register/index.js";
 import {retry} from "../utils/utils.js";
+import {queueLink} from "../utils/common.js";
 
 function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
 
 
-
 export async function registerBrowser(puppeteerEndpoint, account) {
     const browser = await puppeteer.connect({
         browserWSEndpoint: puppeteerEndpoint,
         defaultViewport: null,
-        args: ["--disable-site-isolation-trials"]
+        args: ["--disable-site-isolation-trials"],
+        protocolTimeout: 240000000
     })
     const pages = await browser.pages()
     for (let page of pages) {
@@ -31,9 +37,10 @@ export async function registerBrowser(puppeteerEndpoint, account) {
             const page = await target.page()
             if(page){
                 // page.setRequestInterception(true)
-                await addHCaptchaEventHandler(page,logger)
+                // await addHCaptchaEventHandler(account, page,logger)
                 await addRecaptchaEventHandler(page, logger)
                 await addAutoCheckbox(page)
+                await AddButtonForReEnterQueue(account,page, logger)
             }
         }
     })
@@ -45,7 +52,7 @@ export async function registerBrowser(puppeteerEndpoint, account) {
             console.log("Login triggered")
             loginPages.add(loginPage)
             try {
-                await login(loginPage, account, logger,()=>loginPage.goto('https://sales.coinlist.co/neon-community-sale'))
+                await login(loginPage, account, logger,()=>loginPage.goto(queueLink))
                 // after logging in, redirect to onboarding
             } catch (e) {
                 console.error(e.message)
@@ -55,7 +62,7 @@ export async function registerBrowser(puppeteerEndpoint, account) {
         } else if (target.url().includes("https://coinlist.co/multi_factor")) {
             const multiPage = await target.page();
             try {
-                await multi(multiPage, account,()=>multiPage.goto('https://sales.coinlist.co/neon-community-sale'));
+                await multi(multiPage, account,()=>multiPage.goto(queueLink));
             } catch (e) {
                 console.error(e.message)
             }

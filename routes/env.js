@@ -7,5 +7,7 @@ router.post('/start', envController.startEnv)
 router.post('/create', envController.createEnv)
 router.post('/delete', envController.deleteEnv)
 router.post('/update', envController.update)
+router.get('/recaptcha', envController.recaptcha)
+router.get('/requeue', envController.requeue)
 
 export default router;
