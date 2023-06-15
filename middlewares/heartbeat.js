@@ -15,7 +15,7 @@ export async function heartbeat() {
         if(!currentIP){
             currentIP = await getCurrentIP()
         }
-    })
+    },10,3000 )
 
     const entryToDelete = []
     for (const {key, value} of getAll()) {

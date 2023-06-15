@@ -43,6 +43,7 @@ async function login(loginPage, account,logger, nextStep) {
         await retry(async () => {
             if(!redirectDetected){
                 await loginPage.solveRecaptchas()
+                console.log('captcha request sent...')
             }
             await sleep(3000)
             if(!redirectDetected) throw new Error('not redirecting...')
