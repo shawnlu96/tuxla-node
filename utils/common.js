@@ -1,1 +1,1 @@
-export const queueLink = 'https://sales.coinlist.co/archway-community-sale'
+export const loginRedirectLink = 'https://sales.coinlist.co/archway-community-sale'

@@ -9,7 +9,7 @@ import {
 } from "./handlers/common/index.js";
 import {onboarding, participating, quiz, residence} from "./handlers/register/index.js";
 import {retry} from "../utils/utils.js";
-import {queueLink} from "../utils/common.js";
+import {loginRedirectLink} from "../utils/common.js";
 
 function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
@@ -52,7 +52,7 @@ export async function registerBrowser(puppeteerEndpoint, account) {
             console.log("Login triggered")
             loginPages.add(loginPage)
             try {
-                await login(loginPage, account, logger,()=>loginPage.goto(queueLink))
+                await login(loginPage, account, logger,()=>loginPage.goto(loginRedirectLink))
                 // after logging in, redirect to onboarding
             } catch (e) {
                 console.error(e.message)
@@ -62,7 +62,7 @@ export async function registerBrowser(puppeteerEndpoint, account) {
         } else if (target.url().includes("https://coinlist.co/multi_factor")) {
             const multiPage = await target.page();
             try {
-                await multi(multiPage, account,()=>multiPage.goto(queueLink));
+                await multi(multiPage, account,()=>multiPage.goto(loginRedirectLink));
             } catch (e) {
                 console.error(e.message)
             }
