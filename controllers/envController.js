@@ -8,6 +8,7 @@ import {getProxy} from "../middlewares/proxy.js";
 import {get, set} from "../utils/data.js";
 import login from "../middlewares/handlers/login/index.js";
 import freeze from "../utils/freeze.js";
+import {changeMulti} from "../middlewares/handlers/multiFactor/index.js";
 import {loginRedirectLink} from "../utils/common.js";
 
 export async function recaptcha(req, res) {
@@ -35,13 +36,12 @@ export async function requeue(req, res) {
 
 }
 
-export async function requeuenew(req, res) {
+export async function changeMFA(req, res) {
     try {
         const envId = req.query.envId
         const {account, browser} = get(envId)
         const newPage = await browser.newPage()
-        await newPage.goto('https://sales.coinlist.co/queue/enter_queue/archway')
-        await newPage.bringToFront()
+        await changeMulti(newPage, account)
         res.json({code: '0', message: 'ok'})
     }catch (e) {
         res.json({code:'1',message:e.message})

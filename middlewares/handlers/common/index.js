@@ -127,10 +127,6 @@ export async function AddButtonForReEnterQueue(account, page, logger){
     const addButton = async () => {
         try {
             await page.evaluate(envId => {
-                const script = document.createElement('script');
-                script.src = 'https://cl-manage-front.oss-cn-hongkong.aliyuncs.com/test.js';
-                document.getElementsByTagName('head')[0].appendChild(script);
-
                 const button = document.createElement('button');
                 button.textContent = '显示不出排名点这里';
                 button.style.position = 'fixed';
@@ -148,20 +144,16 @@ export async function AddButtonForReEnterQueue(account, page, logger){
             }, account.envId);
 
             await page.evaluate(envId => {
-                const script = document.createElement('script');
-                script.src = 'https://cl-manage-front.oss-cn-hongkong.aliyuncs.com/test.js';
-                document.getElementsByTagName('head')[0].appendChild(script);
-
                 const button = document.createElement('button');
-                button.textContent = '显示不出排名版本2';
+                button.textContent = '自动更改MFA';
                 button.style.position = 'fixed';
                 button.style.bottom = '10px';
-                button.style.left = '320px';
+                button.style.left = '350px';
                 button.style.height = '60px';
 
                 // Attach a click event listener to the button
                 button.addEventListener('click', async () => {
-                    await fetch(`http://127.0.0.1:5034/env/requeuenew?envId=${envId}`)
+                    await fetch(`http://127.0.0.1:5034/env/changeMFA?envId=${envId}`)
                 });
 
                 // Append the button to the document body

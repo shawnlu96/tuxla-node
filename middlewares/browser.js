@@ -1,6 +1,6 @@
 import puppeteer from 'puppeteer-extra';
 import login from "./handlers/login/index.js";
-import multi from "./handlers/multiFactor/index.js";
+import {multi} from "./handlers/multiFactor/index.js";
 import {
     addAutoCheckbox,
     AddButtonForReEnterQueue,
